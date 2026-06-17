@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cheetah Final Mile — Recipient Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-dark: #1a1a2e;
+      --brand-accent: #ffb800;
+      --brand-accent-rgb: 255,184,0;
+      --text-muted: #9e9da8;
+      --border: #cfced5;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:'Inter',sans-serif; background:var(--brand-dark);
+      color:white; font-size:14px; line-height:1.5; min-height:100vh;
+      display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .card {
+      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12);
+      border-radius:16px; padding:40px 32px; max-width:480px; width:100%;
+      text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    }
+    .brand-mark { display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:24px; }
+    .brand-mark img { height:56px; width:auto; display:block; }
+    .brand-mark .wordmark { font-size:20px; font-weight:700; letter-spacing:0.6px; }
+    h1 { font-size:24px; margin-bottom:8px; font-weight:700; }
+    p.lead { color:rgba(255,255,255,0.7); margin-bottom:24px; font-size:14px; }
+    .links { display:flex; flex-direction:column; gap:12px; margin-top:8px; }
+    .link {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 20px; border-radius:12px; text-decoration:none; color:white;
+      background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14);
+      transition:all 200ms ease; font-weight:700;
+    }
+    .link:hover { background:var(--brand-accent); color:var(--brand-dark); border-color:var(--brand-accent); transform:translateY(-2px); }
+    .link .sub { font-weight:400; font-size:12px; color:rgba(255,255,255,0.6); }
+    .link:hover .sub { color:rgba(26,26,46,0.7); }
+    .arrow { font-size:18px; }
+    .footer { margin-top:28px; color:var(--text-muted); font-size:12px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand-mark">
+      <img src="assets/cheetah-logo.jpg" alt="Cheetah Final Mile">
+      <span class="wordmark">CHEETAH FINAL MILE</span>
+    </div>
+    <h1>Recipient Portal</h1>
+    <p class="lead">Demo links for the Grandview, MO last-mile flow.</p>
+    <div class="links">
+      <a class="link" href="receiver-mobile.html">
+        <div style="text-align:left;">
+          📱 Recipient confirmation
+          <div class="sub">Confirm details, pick a delivery window, set authority to leave</div>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+      <a class="link" href="tracking.html">
+        <div style="text-align:left;">
+          🚚 Live tracking
+          <div class="sub">Timeline, driver, delivery window — recipient-facing view</div>
+        </div>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+    <div class="footer">Cheetah Final Mile — Powered by DFRNT</div>
+  </div>
+</body>
+</html>

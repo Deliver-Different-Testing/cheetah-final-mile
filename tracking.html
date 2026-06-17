@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Your Delivery | Cheetah Final Mile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-dark: #1a1a2e;
+      --brand-accent: #ffb800;
+      --brand-accent-rgb: 255,184,0;
+      --brand-red: #e63946;
+      --brand-blue: #2a52be;
+      --surface-light: #f4f2f1;
+      --surface-cream: #f8f7f7;
+      --border: #cfced5;
+      --border-light: #e6e5ea;
+      --text-primary: #0d0c2c;
+      --text-secondary: #6e6d80;
+      --text-muted: #9e9da8;
+      --success: #13b964;
+      --success-bg: #d0f1e0;
+      --warning: #fe811a;
+      --warning-bg: #ffe6d1;
+      --error: #dc3246;
+      --shadow-sm: 0 1px 2px rgba(0,14,37,0.05);
+      --shadow-md: 0 2px 8px rgba(0,14,37,0.08);
+      --shadow-lg: 0 4px 12px rgba(0,14,37,0.12);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--surface-light); color:var(--text-primary); font-size:14px; line-height:1.5; min-height:100vh; }
+
+    /* Header */
+    .header { background:var(--brand-dark); padding:16px 24px; }
+    .header-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+    .logo { display:flex; align-items:center; gap:12px; }
+    .logo img { height:36px; width:auto; display:block; }
+    .logo-text { color:white; font-size:18px; font-weight:700; letter-spacing:0.5px; }
+    .logo-divider { width:1px; height:24px; background:rgba(255,255,255,0.2); }
+    .logo-sub { color:var(--text-muted); font-size:12px; }
+    .search-bar { display:flex; gap:8px; }
+    .search-bar input {
+      background:white; border:2px solid var(--border); padding:10px 16px; border-radius:9999px;
+      width:240px; font-size:14px; font-family:inherit; color:var(--text-primary);
+      transition:border-color 200ms ease;
+    }
+    .search-bar input:focus { outline:none; border-color:var(--brand-accent); box-shadow:0 0 0 3px rgba(var(--brand-accent-rgb),0.25); }
+    .search-bar button {
+      background:var(--brand-accent); color:var(--brand-dark); border:none; padding:10px 24px;
+      border-radius:9999px; font-weight:700; font-size:14px; cursor:pointer;
+      transition:all 200ms ease;
+    }
+    .search-bar button:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(var(--brand-accent-rgb),0.35); }
+
+    /* Container */
+    .container { max-width:1200px; margin:0 auto; padding:24px; }
+
+    /* Tracking header card */
+    .tracking-header { background:white; border-radius:12px; padding:24px; margin-bottom:24px; box-shadow:var(--shadow-sm); }
+    .tracking-refs { display:flex; gap:32px; flex-wrap:wrap; margin-bottom:20px; }
+    .ref-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+    .ref-value { font-size:20px; font-weight:700; font-family:'Inter',monospace; }
+
+    /* Status banner */
+    .status-banner { padding:20px 24px; border-radius:8px; display:flex; align-items:center; gap:16px; color:white; }
+    .status-banner.in-transit { background:var(--brand-accent); color:var(--brand-dark); }
+    .status-banner.delivered { background:var(--success); }
+    .status-banner.out-for-delivery { background:var(--brand-accent); color:var(--brand-dark); }
+    .status-icon { font-size:36px; }
+    .status-text h2 { font-size:24px; font-weight:700; }
+    .status-text p { font-size:14px; opacity:0.85; }
+
+    /* Main grid */
+    .main-grid { display:grid; grid-template-columns:2fr 1fr; gap:24px; }
+
+    /* Timeline */
+    .card { background:white; border-radius:12px; padding:24px; box-shadow:var(--shadow-sm); }
+    .card-title { font-size:18px; font-weight:700; margin-bottom:24px; display:flex; align-items:center; gap:8px; }
+    .timeline { padding-left:28px; position:relative; }
+    .timeline::before { content:''; position:absolute; left:8px; top:8px; bottom:8px; width:2px; background:var(--border-light); }
+    .tl-item { position:relative; padding-bottom:28px; }
+    .tl-item:last-child { padding-bottom:0; }
+    .tl-dot {
+      position:absolute; left:-24px; top:4px; width:18px; height:18px; border-radius:50%;
+      background:white; border:3px solid var(--border);
+    }
+    .tl-item.done .tl-dot { background:var(--success); border-color:var(--success); }
+    .tl-item.done::after { content:'✓'; position:absolute; left:-20px; top:6px; color:white; font-size:10px; font-weight:700; }
+    .tl-item.active .tl-dot {
+      background:var(--brand-accent); border-color:var(--brand-accent);
+      box-shadow:0 0 0 6px rgba(var(--brand-accent-rgb),0.2);
+      animation:pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow:0 0 0 0 rgba(var(--brand-accent-rgb),0.4); }
+      70% { box-shadow:0 0 0 12px rgba(var(--brand-accent-rgb),0); }
+      100% { box-shadow:0 0 0 0 rgba(var(--brand-accent-rgb),0); }
+    }
+    .tl-row { display:flex; justify-content:space-between; align-items:flex-start; }
+    .tl-title { font-size:16px; font-weight:700; margin-bottom:4px; }
+    .tl-desc { font-size:14px; color:var(--text-secondary); }
+    .tl-time { font-size:12px; color:var(--text-muted); text-align:right; white-space:nowrap; }
+
+    /* ATL notice */
+    .atl-notice {
+      background:var(--warning-bg); border:1px solid var(--warning); border-radius:8px;
+      padding:16px; margin-top:24px; display:flex; gap:12px; align-items:flex-start;
+    }
+    .atl-notice strong { font-weight:700; }
+    .atl-notice p { font-size:13px; color:var(--text-secondary); margin-top:4px; }
+
+    /* Sidebar cards */
+    .sidebar { display:flex; flex-direction:column; gap:24px; }
+
+    /* Map placeholder */
+    .map-box { background:var(--surface-cream); height:250px; border-radius:8px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+    .live-badge {
+      background:var(--error); color:white; padding:4px 10px; border-radius:9999px;
+      font-size:11px; font-weight:700; animation:blink 2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.7} }
+    .map-label { background:white; padding:8px 16px; border-radius:8px; font-size:14px; color:var(--text-secondary); box-shadow:var(--shadow-sm); z-index:1; }
+
+    /* Driver info */
+    .driver-row { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+    .driver-avatar {
+      width:48px; height:48px; border-radius:50%;
+      background:linear-gradient(135deg,var(--brand-accent),var(--brand-red));
+      display:flex; align-items:center; justify-content:center; color:white; font-size:18px; font-weight:700;
+    }
+    .driver-name { font-size:16px; font-weight:700; }
+    .driver-meta { font-size:13px; color:var(--text-secondary); }
+    .contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .contact-btn {
+      padding:10px; border:2px solid var(--border); border-radius:9999px; background:white;
+      color:var(--text-primary); font-size:14px; font-weight:700; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      transition:all 200ms ease; font-family:inherit;
+    }
+    .contact-btn:hover { border-color:var(--brand-accent); color:var(--brand-dark); }
+
+    /* Detail rows */
+    .detail-row { padding:12px 0; border-bottom:1px solid var(--border-light); }
+    .detail-row:last-child { border-bottom:none; }
+    .detail-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+    .detail-value { font-size:14px; font-weight:700; }
+
+    @media (max-width:768px) {
+      .main-grid { grid-template-columns:1fr; }
+      .search-bar { width:100%; }
+      .search-bar input { flex:1; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <img src="assets/cheetah-logo.jpg" alt="Cheetah Final Mile">
+      <span class="logo-text">CHEETAH FINAL MILE</span>
+      <div class="logo-divider"></div>
+      <span class="logo-sub">Delivery Tracking</span>
+    </div>
+    <div class="search-bar">
+      <input type="text" placeholder="Enter tracking number" value="CFM-2026-789456">
+      <button>Track</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tracking-header">
+    <div class="tracking-refs">
+      <div>
+        <div class="ref-label">Tracking Number</div>
+        <div class="ref-value">CFM-2026-789456</div>
+      </div>
+      <div>
+        <div class="ref-label">Parcel Reference</div>
+        <div class="ref-value">GVW-CFM-789456</div>
+      </div>
+      <div>
+        <div class="ref-label">Service Type</div>
+        <div class="ref-value">Final-Mile Delivery</div>
+      </div>
+    </div>
+    <div class="status-banner out-for-delivery">
+      <div class="status-icon">📍</div>
+      <div class="status-text">
+        <h2>Out for Delivery</h2>
+        <p>Your parcel is on the way — estimated delivery between 2:00 PM – 5:00 PM today</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div>
+      <div class="card">
+        <div class="card-title">📦 Delivery Timeline</div>
+        <div class="timeline">
+          <div class="tl-item done">
+            <div class="tl-dot"></div>
+            <div class="tl-row">
+              <div><div class="tl-title">Scanned In</div><div class="tl-desc">Received at Grandview, MO facility — 13219 Arrington Rd</div></div>
+              <div class="tl-time">17 Jun 2026<br>9:30 AM</div>
+            </div>
+          </div>
+          <div class="tl-item done">
+            <div class="tl-dot"></div>
+            <div class="tl-row">
+              <div><div class="tl-title">Recipient Notified</div><div class="tl-desc">SMS + email sent with delivery window options</div></div>
+              <div class="tl-time">17 Jun 2026<br>9:32 AM</div>
+            </div>
+          </div>
+          <div class="tl-item done">
+            <div class="tl-dot"></div>
+            <div class="tl-row">
+              <div><div class="tl-title">Window Confirmed</div><div class="tl-desc">Recipient picked today, 2:00 PM – 5:00 PM</div></div>
+              <div class="tl-time">17 Jun 2026<br>10:15 AM</div>
+            </div>
+          </div>
+          <div class="tl-item done">
+            <div class="tl-dot"></div>
+            <div class="tl-row">
+              <div><div class="tl-title">Assigned to Driver</div><div class="tl-desc">Driver: Marcus Reed (Vehicle: CFM-042)</div></div>
+              <div class="tl-time">17 Jun 2026<br>12:45 PM</div>
+            </div>
+          </div>
+          <div class="tl-item active">
+            <div class="tl-dot"></div>
+            <div class="tl-row">
+              <div><div class="tl-title">Out for Delivery</div><div class="tl-desc">Your parcel is currently being delivered — 3 stops away</div></div>
+              <div class="tl-time">17 Jun 2026<br>2:30 PM</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-row">
+              <div><div class="tl-title">Delivered</div><div class="tl-desc">Pending delivery completion</div></div>
+              <div class="tl-time">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="atl-notice">
+        <span style="font-size:20px;">⚠️</span>
+        <div>
+          <strong>Authority to Leave Active</strong>
+          <p>You have authorized us to leave your parcel at: <strong>Front door</strong> if you're not home. The driver will take a photo as proof of delivery.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="card">
+        <div class="card-title" style="justify-content:space-between;">
+          <span>📍 Live Tracking</span>
+          <span class="live-badge">● LIVE</span>
+        </div>
+        <div class="map-box">
+          <div class="map-label">🚚 3 stops away</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="driver-row">
+          <div class="driver-avatar">MR</div>
+          <div>
+            <div class="driver-name">Marcus Reed</div>
+            <div class="driver-meta">Vehicle: CFM-042 · ⭐ 4.9 rating</div>
+          </div>
+        </div>
+        <div class="contact-grid">
+          <button class="contact-btn">📞 Call</button>
+          <button class="contact-btn">💬 Message</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 Delivery Details</div>
+        <div class="detail-row">
+          <div class="detail-label">Delivery Address</div>
+          <div class="detail-value">2418 Belleview Ave, Apt 3B<br>Kansas City<br>MO 64108</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Recipient</div>
+          <div class="detail-value">Jordan Carter</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Contact Phone</div>
+          <div class="detail-value">+1 (816) 555-0142</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Delivery Window</div>
+          <div class="detail-value">Today, 2:00 PM – 5:00 PM</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Special Instructions</div>
+          <div class="detail-value" style="font-weight:400;">Authority to leave at front door if not home</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
