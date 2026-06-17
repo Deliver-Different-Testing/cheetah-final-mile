@@ -158,6 +158,21 @@
     .atl-input.required { border-color:var(--error); }
     .error-text { color:var(--error); font-size:12px; margin-top:4px; }
 
+    /* Show more windows */
+    .show-more-btn {
+      width:100%; background:transparent; border:2px dashed var(--border);
+      color:var(--text-secondary); padding:12px 16px; border-radius:12px;
+      font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;
+      transition:all 200ms ease; margin-top:4px;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .show-more-btn:hover { border-color:var(--brand-accent); color:var(--brand-dark); background:rgba(var(--brand-accent-rgb),0.06); }
+    .show-more-btn .chevron { transition:transform 200ms ease; }
+    .show-more-btn.expanded .chevron { transform:rotate(180deg); }
+    .extra-slots { display:none; flex-direction:column; gap:0; }
+    .extra-slots.visible { display:flex; }
+    .extra-slots .slot { margin-bottom:12px; }
+
     /* Confirm button */
     .confirm-button {
       background:var(--brand-accent); color:var(--brand-dark); border:none;
@@ -314,27 +329,35 @@ function getSlotDates() {
   const now = new Date();
   const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const today = new Date(now);
-  const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate()+1);
   const fmt = d => `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
 
   const slots = [];
+  const today = new Date(now);
   if (now.getHours() < 12) {
     slots.push({ label: `Today, ${fmt(today)}`, time: '9:00 AM – 12:00 PM' });
   }
   if (now.getHours() < 17) {
     slots.push({ label: `Today, ${fmt(today)}`, time: '2:00 PM – 5:00 PM' });
   }
-  slots.push({ label: `Tomorrow, ${fmt(tomorrow)}`, time: '9:00 AM – 12:00 PM' });
-  slots.push({ label: `Tomorrow, ${fmt(tomorrow)}`, time: '2:00 PM – 5:00 PM' });
+
+  // Generate the next 7 days of slots so the recipient can pick further out
+  // if today/tomorrow don't suit. First 4 visible, rest behind "Show more".
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date(now); d.setDate(d.getDate() + i);
+    const label = i === 1 ? `Tomorrow, ${fmt(d)}` : fmt(d);
+    slots.push({ label, time: '9:00 AM – 12:00 PM' });
+    slots.push({ label, time: '2:00 PM – 5:00 PM' });
+  }
 
   if (slots.length) slots[0].first = true;
   return slots;
 }
 
+const VISIBLE_SLOTS = 4;
+
 function renderSlots() {
   const slots = getSlotDates();
-  document.getElementById('deliverySlots').innerHTML = slots.map((s, i) =>
+  const slotHtml = (s, i) =>
     `<div class="slot${i===0?' selected':''}" onclick="selectSlot(this)">
       ${s.first ? '<div class="first-available">FIRST AVAILABLE</div>' : ''}
       <div class="slot-header">
@@ -344,8 +367,28 @@ function renderSlots() {
           <div class="slot-time">${s.time}</div>
         </div>
       </div>
-    </div>`
-  ).join('');
+    </div>`;
+
+  const visible = slots.slice(0, VISIBLE_SLOTS).map(slotHtml).join('');
+  const extra = slots.slice(VISIBLE_SLOTS).map((s, i) => slotHtml(s, i + VISIBLE_SLOTS)).join('');
+  const extraCount = slots.length - VISIBLE_SLOTS;
+
+  document.getElementById('deliverySlots').innerHTML = visible +
+    (extraCount > 0 ? `<div class="extra-slots" id="extraSlots">${extra}</div>
+      <button class="show-more-btn" id="showMoreBtn" onclick="toggleMoreSlots()">
+        <span id="showMoreLabel">Show ${extraCount} more windows</span>
+        <span class="chevron">▾</span>
+      </button>` : '');
+}
+
+function toggleMoreSlots() {
+  const extra = document.getElementById('extraSlots');
+  const btn = document.getElementById('showMoreBtn');
+  const label = document.getElementById('showMoreLabel');
+  const expanded = extra.classList.toggle('visible');
+  btn.classList.toggle('expanded', expanded);
+  const extraCount = extra.querySelectorAll('.slot').length;
+  label.textContent = expanded ? 'Show fewer windows' : `Show ${extraCount} more windows`;
 }
 
 renderSlots();
